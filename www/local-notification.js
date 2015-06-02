@@ -314,6 +314,9 @@ exports.registerPermission = function (callback, scope) {
     this.core.registerPermission(callback, scope);
 };
 
+exports.registerCategories = function(categories) {
+    cordova.exec(null, null, 'LocalNotification', 'registerCategories', [categories]);
+};
 
 /****************
  * DEPRECATIONS *

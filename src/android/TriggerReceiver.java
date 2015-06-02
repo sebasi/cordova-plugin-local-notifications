@@ -48,7 +48,7 @@ public class TriggerReceiver extends de.appplant.cordova.plugin.notification.Tri
         super.onTrigger(notification, updated);
 
         if (!updated) {
-            LocalNotification.fireEvent("trigger", notification);
+            LocalNotification.fireEvent("trigger", notification, null);
         }
     }
 

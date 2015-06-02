@@ -41,16 +41,16 @@ public class ClickActivity extends de.appplant.cordova.plugin.notification.Click
      *      Wrapper around the local notification
      */
     @Override
-    public void onClick(Notification notification) {
-        LocalNotification.fireEvent("click", notification);
+    public void onClick(Notification notification, String action) {
+        LocalNotification.fireEvent("click", notification, action);
 
         if (!notification.getOptions().isOngoing()) {
             String event = notification.isRepeating() ? "clear" : "cancel";
 
-            LocalNotification.fireEvent(event, notification);
+            LocalNotification.fireEvent(event, notification, action);
         }
 
-        super.onClick(notification);
+        super.onClick(notification, action);
     }
 
     /**

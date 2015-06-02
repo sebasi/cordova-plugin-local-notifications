@@ -42,7 +42,7 @@ public class ClearReceiver extends de.appplant.cordova.plugin.notification.Clear
     @Override
     public void onClear (Notification notification) {
         super.onClear(notification);
-        LocalNotification.fireEvent("clear", notification);
+        LocalNotification.fireEvent("clear", notification, null);
     }
 
 }
