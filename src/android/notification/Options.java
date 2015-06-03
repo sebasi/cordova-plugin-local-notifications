@@ -300,4 +300,8 @@ public class Options {
         return options.toString();
     }
 
+    public String getCategory () {
+        return options.optString("category", "NO_BUTTONS");
+    }
+
 }

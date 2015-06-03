@@ -38,7 +38,7 @@ public class ClickActivity extends AbstractClickActivity {
      *      Wrapper around the local notification
      */
     @Override
-    public void onClick(Notification notification) {
+    public void onClick(Notification notification, String action) {
         launchApp();
     }
 

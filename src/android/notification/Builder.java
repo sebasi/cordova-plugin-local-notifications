@@ -28,10 +28,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Random;
+
+import de.appplant.cordova.plugin.localnotification.LocalNotification;
 
 /**
  * Builder class for local notifications. Build fully configured local
@@ -141,6 +145,7 @@ public class Builder {
 
         applyDeleteReceiver(builder);
         applyContentReceiver(builder);
+        addActions(builder);
 
         return new Notification(context, options, builder, triggerReceiver);
     }
@@ -191,4 +196,34 @@ public class Builder {
         builder.setContentIntent(contentIntent);
     }
 
+    // add our action buttons
+    private NotificationCompat.Builder addActions(NotificationCompat.Builder builder) {
+        String cat_id = options.getCategory();
+        if(!cat_id.equals("NO_BUTTONS")) {
+            JSONObject category = LocalNotification.categories.optJSONObject(cat_id);
+            JSONArray actions = category.optJSONArray("actions");
+            Intent intent;
+            PendingIntent contentIntent;
+
+            // add each action
+            for(int i = 0; i < actions.length(); i++) {
+                int requestCode = new Random().nextInt();
+                JSONObject action = actions.optJSONObject(i);
+                int icon = action.optInt("icon");
+                String title = action.optString("title");
+
+                intent = new Intent(context, clickActivity)
+                        .setAction(title)
+                        .putExtra(Options.EXTRA, options.toString())
+                        .putExtra("button", title)
+                        .setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+                contentIntent = PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+                builder = builder.addAction(icon, title, contentIntent);
+            }
+        }
+
+        return builder;
+    }
 }

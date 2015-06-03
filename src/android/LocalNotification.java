@@ -60,6 +60,8 @@ public class LocalNotification extends CordovaPlugin {
     // Queues all events before deviceready
     private static ArrayList<String> eventQueue = new ArrayList<String>();
 
+    public static JSONObject categories;
+
     /**
      * Called after plugin construction and fields have been initialized.
      * Prefer to use pluginInitialize instead since there is no value in
@@ -196,6 +198,9 @@ public class LocalNotification extends CordovaPlugin {
                 else if (action.equals("deviceready")) {
                     deviceready();
                 }
+                else if (action.equals("registerCategories")) {
+                    registerCategories(args);
+                }
             }
         });
 
@@ -215,7 +220,7 @@ public class LocalNotification extends CordovaPlugin {
             Notification notification =
                     getNotificationMgr().schedule(options, TriggerReceiver.class);
 
-            fireEvent("schedule", notification);
+            fireEvent("schedule", notification, null);
         }
     }
 
@@ -233,7 +238,7 @@ public class LocalNotification extends CordovaPlugin {
             Notification notification =
                     getNotificationMgr().update(id, update, TriggerReceiver.class);
 
-            fireEvent("update", notification);
+            fireEvent("update", notification, null);
         }
     }
 
@@ -251,7 +256,7 @@ public class LocalNotification extends CordovaPlugin {
                     getNotificationMgr().cancel(id);
 
             if (notification != null) {
-                fireEvent("cancel", notification);
+                fireEvent("cancel", notification, null);
             }
         }
     }
@@ -278,7 +283,7 @@ public class LocalNotification extends CordovaPlugin {
                     getNotificationMgr().clear(id);
 
             if (notification != null) {
-                fireEvent("clear", notification);
+                fireEvent("clear", notification, null);
             }
         }
     }
@@ -520,7 +525,7 @@ public class LocalNotification extends CordovaPlugin {
      *      The event name
      */
     private void fireEvent (String event) {
-        fireEvent(event, null);
+        fireEvent(event, null, null);
     }
 
     /**
@@ -531,9 +536,10 @@ public class LocalNotification extends CordovaPlugin {
      * @param notification
      *      Optional local notification to pass the id and properties.
      */
-    static void fireEvent (String event, Notification notification) {
+    static void fireEvent (String event, Notification notification, String action) {
         String state = getApplicationState();
-        String params = "\"" + state + "\"";
+        String actionJS = action != null ? "\"" + action + "\"" : "null";
+        String params = "\"" + state + "\"" + ", " + actionJS;
 
         if (notification != null) {
             params = notification.toString() + "," + params;
@@ -542,7 +548,11 @@ public class LocalNotification extends CordovaPlugin {
         String js = "cordova.plugins.notification.local.core.fireEvent(" +
                 "\"" + event + "\"," + params + ")";
 
-        sendJavascript(js);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            webView.sendJavascript(js);
+        } else {
+            webView.loadUrl("javascript:" + js);
+        }
     }
 
     /**
@@ -594,4 +604,7 @@ public class LocalNotification extends CordovaPlugin {
         return Manager.getInstance(cordova.getActivity());
     }
 
+    private void registerCategories(JSONArray data) {
+        categories = data.optJSONObject(0);
+    }
 }

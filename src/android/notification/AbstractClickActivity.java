@@ -27,6 +27,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,6 +53,7 @@ abstract public class AbstractClickActivity extends Activity {
         Context context = getApplicationContext();
 
         try {
+            String action = intent.getAction();
             String data = bundle.getString(Options.EXTRA);
             JSONObject options = new JSONObject(data);
 
@@ -61,7 +63,7 @@ abstract public class AbstractClickActivity extends Activity {
             Notification notification =
                     buildNotification(builder);
 
-            onClick(notification);
+            onClick(notification, action);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -73,7 +75,7 @@ abstract public class AbstractClickActivity extends Activity {
      * @param notification
      *      Wrapper around the local notification
      */
-    abstract public void onClick (Notification notification);
+    abstract public void onClick (Notification notification, String action);
 
     /**
      * Build notification specified by options.
